@@ -1,0 +1,24 @@
+# Intelligent Pipeline Inspection Robot
+
+## Phase 1 - Computer Vision
+- [ ] Read images
+- [ ] Display images
+- [ ] Capture video
+- [ ] Color spaces
+- [ ] Image transformations
+- [ ] Edge detection
+- [ ] Contours
+- [ ] Morphological operations
+- [ ] Crack detection prototype
+
+## Phase 2 - AI
+- [ ] Learn PyTorch
+- [ ] Build dataset
+- [ ] Train YOLO
+- [ ] Test defect detection
+
+## Phase 3 - Robotics
+- [ ] Learn ESP32
+- [ ] Control motors
+- [ ] Read sensors
+...
