@@ -1,13 +1,13 @@
 # Intelligent Pipeline Inspection Robot
 
 ## Phase 1 - Computer Vision
-- [ ] Read images
-- [ ] Display images
+- [ Done] Read images
+- [ Done] Display images
 - [ ] Capture video
 - [ ] Color spaces
 - [ ] Image transformations
-- [ ] Edge detection
-- [ ] Contours
+- [ Done] Edge detection
+- [ Done] Contours
 - [ ] Morphological operations
 - [ ] Crack detection prototype
 
