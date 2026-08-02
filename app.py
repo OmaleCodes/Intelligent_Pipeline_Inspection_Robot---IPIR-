@@ -2,6 +2,7 @@ import cv2 as cv
 import config
 from vision.preprocess import Pipelinepreprocessor
 from vision.detector import DefectDetector
+from vision.camera import CameraStream
 
 #Load sample pipe image
 
@@ -15,6 +16,9 @@ preprocessor = Pipelinepreprocessor()
 
 #instance of defect dector class
 detector = DefectDetector()
+
+#instance of camera vision( video capturing)
+camera = CameraStream()
 
 #process the frame through the vision model
 results = preprocessor.process(frame)
