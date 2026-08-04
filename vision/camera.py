@@ -13,12 +13,15 @@ class CameraStream:
         self.cap = None  #holds the latest frame
         self.ret = False   #boolean if frame read succeed
         self.running = False   #starting and stoping the background thread
+        self.frame = None  #holds the latest frame
+        
 
+    def start(self): #method initialization 
+        self.cap = cv.VideoCapture(self.source)
 
-    def Start(self): #method initialization 
-        #opens the camera
-        self.cap = cv.videoCapture(self.source)
-
+        if not self.cap.isOpened():
+            raise RuntimeError(f"cannot open Camera source {self.source}")
+        
         #setting camera resolution and frame rate from config.py
         self.cap.set(cv.CAP_PROP_FRAME_WIDTH, config.Frame_Width)
         self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, config.Frame_Height)
@@ -31,18 +34,22 @@ class CameraStream:
         return self
 
 
-#background method (the worker)
+    #background method (the worker)
     def _update(self):
         while self.running is True:
-            if self.cap.isOpened():
-                ret, frame = self.cap.read()
-                if ret is True:
-                    self.ret = ret
-                    self.frame = frame
-            #when a video file reaches the end, rewind to start to using 
-            else:
-                self.cap.set(cv.CAP_PROP_POS_FRAMES, 0)
-                time.sleep(0.01) #time so it doesn't max out CPU
+            try:
+                if self.cap.isOpened():
+                    ret, frame = self.cap.read()
+                    if ret is True:
+                        self.ret = ret
+                        self.frame = frame
+
+                #when a video file reaches the end, rewind to start to using 
+                else:
+                    self.cap.set(cv.CAP_PROP_POS_FRAMES, 0)
+                    time.sleep(0.01) #time so it doesn't max out CPU                   
+            except Exception as e:
+                print("Error:", e)  
 
     def read(self):
         return (self.ret, self.frame)
@@ -50,5 +57,5 @@ class CameraStream:
     def stop(self):
         self.running = False
         if self.cap: 
+            self.thread.join()  #wait for the thread to finish
             self.cap.release()
-
