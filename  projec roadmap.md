@@ -3,13 +3,13 @@
 ## Phase 1 - Computer Vision
 - [ Done] Read images
 - [ Done] Display images
-- [ ] Capture video
+- [ Done] Capture video
 - [ ] Color spaces
 - [ ] Image transformations
 - [ Done] Edge detection
 - [ Done] Contours
 - [ ] Morphological operations
-- [ ] Crack detection prototype
+- [ Done] Crack detection prototype
 
 ## Phase 2 - AI
 - [ ] Learn PyTorch
