@@ -67,3 +67,16 @@ class InspectionDatabase:
         
         conn.commit()
         conn.close()
+
+
+    def end_run(self, run_id):
+        """Mark an inspection run as COMPLETED when the session ends"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE inspection_runs
+            SET status = ?
+            WHERE run_id = ?""", ("COMPLETED", run_id))
+        
+        conn.commit()
+        conn.close()
