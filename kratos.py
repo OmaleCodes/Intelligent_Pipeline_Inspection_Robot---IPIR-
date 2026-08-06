@@ -64,6 +64,8 @@ while True:
           break   #exit loop if 'q' is pressed
         
 camera.stop()  #stop the camera stream
+db.end_run(run_id)  #mark the inspection run as completed
+print(f"Inspection Session Completed: {run_id}")
 cv.destroyAllWindows()
 
 
