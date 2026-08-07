@@ -34,6 +34,7 @@ print(f"Inspection Session Started: {run_id}")
 while True:
       ret, frame = camera.read()
       if ret is False or frame is None:
+          time.sleep(0.1)  #wait for a short time before trying to read the next frame
           continue  #skip this iteration if frame read failed
       
          #process the frame through the vision model
