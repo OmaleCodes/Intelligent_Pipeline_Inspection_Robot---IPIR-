@@ -80,3 +80,19 @@ class InspectionDatabase:
         
         conn.commit()
         conn.close()
+
+    #Connects to Database to fetch inspections runs
+    def get_inspection_runs(self):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT run_id FROM inspection_runs ORDER BY start_time DESC")
+            runs = [row[0] for row in cursor.fetchall()]
+            return runs
+
+    #Fetch defects for selected runs
+    def get_defects_for_runs(self,selected_run):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, timestamp, defect_type, x, y, w, h FROM defect_logs WHERE run_id = ? ", (selected_run,))
+            defects = cursor.fetchall()
+            return defects
