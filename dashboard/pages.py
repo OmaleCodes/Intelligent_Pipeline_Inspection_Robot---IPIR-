@@ -1,5 +1,6 @@
 import sys
 import os
+from charts import render_defect_trend
 
 # Tell Python to include the main project root folder in its search path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -10,6 +11,7 @@ import sqlite3
 from database.models import InspectionDatabase
 
 
+
 #Configuration of page and header
 st.set_page_config(page_title="IPIR Operator Console", page_icon="🤖", layout="wide")
 st.title("IPIR Pipeline Inspection Robot - Operator Console")
@@ -18,8 +20,14 @@ st.markdown("---")
 # 1. Instantiate database (this automatically runs _create_Tables() if the DB is fresh!)
 db = InspectionDatabase()
 
+#initializatio of variable to get the inspection data
 run = db.get_inspection_runs()
 
+#fetches the data from the database to get total defects
+T_defect = db.total_defect()
+
+#draws the chart of total defects
+render_defect_trend(T_defect)
 
 #Sidebar Run Selection
 st.sidebar.header("🕹️ Controls")
