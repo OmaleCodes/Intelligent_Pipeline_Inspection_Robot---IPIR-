@@ -1,5 +1,6 @@
 "Database initialization to log and store inspection data in mysqlite3 database"
 
+from itertools import count
 import sqlite3
 import os
 import time
@@ -93,6 +94,14 @@ class InspectionDatabase:
     def get_defects_for_runs(self,selected_run):
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, timestamp, defect_type, x, y, w, h FROM defect_logs WHERE run_id = ? ", (selected_run,))
+            cursor.execute("SELECT id, timestamp, defect_type, x, y, w, h FROM defect_logs WHERE run_id = ? ", (selected_run))
             defects = cursor.fetchall()
             return defects
+
+    #feteches all defects as a single value
+    def total_defect(self):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT run_id , COUNT(*) FROM defect_logs GROUP by run_id ORDER BY run_id ")
+            count = cursor.fetchall()
+            return count
