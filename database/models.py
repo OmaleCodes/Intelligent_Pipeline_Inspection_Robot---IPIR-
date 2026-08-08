@@ -92,7 +92,7 @@ class InspectionDatabase:
     def get_defects_for_runs(self,selected_run):
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, timestamp, defect_type, x, y, w, h FROM defect_logs WHERE run_id = ? ", (selected_run))
+            cursor.execute("SELECT id, timestamp, defect_type, x, y, w, h FROM defect_logs WHERE run_id = ? ", (selected_run,))
             defects = cursor.fetchall()
             return defects
 
