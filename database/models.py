@@ -1,6 +1,4 @@
 "Database initialization to log and store inspection data in mysqlite3 database"
-
-from itertools import count
 import sqlite3
 import os
 import time
