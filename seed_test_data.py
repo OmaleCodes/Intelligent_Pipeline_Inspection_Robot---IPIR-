@@ -15,11 +15,11 @@ print(f"Started run: {run_id}")
 
 # 2. Log a handful of fake defects — same shape kratos.py logs in its loop
 fake_defects = [
-    ("CRACK", 120, 80, 40, 45),
-    ("CRACK", 200, 102, 25, 25),
+    ("CRACK", 120, 80, 40, 15),
+    ("CRACK", 300, 210, 25, 25),
     ("RUST", 60, 400, 60, 60),
-    ("RUST", 400, 510, 35, 35),
-    ("RUST", 222, 320, 80, 20),
+    ("RUST", 500, 150, 35, 35),
+    ("RUST", 220, 320, 50, 20),
 ]
 
 for defect_type, x, y, w, h in fake_defects:
