@@ -31,6 +31,10 @@ Canny_Threshold2 = 150
 #minimum pixel area to count as defect
 Median_Defect_Area = 50  
 
+#5. Distance and metrics calibration
+mm_per_pixel = 0.5
+Robot_Speed_mps = 0.15
+
 """
 End of configuration depending if there is modification needed 
 """
