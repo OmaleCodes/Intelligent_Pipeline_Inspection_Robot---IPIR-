@@ -5,6 +5,12 @@ from charts import render_defect_trend
 # Tell Python to include the main project root folder in its search path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+try:
+    from dashboard.charts import render_defect_trend
+except ModuleNotFoundError:
+    from charts import render_defect_trend
+
+
 import streamlit as st
 import pandas as pd
 import sqlite3
