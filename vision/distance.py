@@ -2,16 +2,21 @@ import time
 import config
 
 
-class DISTANCE_ESTIMATOR:
+class Distance_estimator:
+
     def __init__(self):
         self.cumulative_distance_m = 0.0
         self.mm_per_pixel = config.mm_per_pixel
         self.speed_mps = config.Robot_Speed_mps
         self.last_time = time.time()
 
+
+
     def pixel_to_mm(self, px_value):
         mm = px_value * self.mm_per_pixel
         return mm
+
+
 
     def update_odometry(self):
         current_time = time.time()
