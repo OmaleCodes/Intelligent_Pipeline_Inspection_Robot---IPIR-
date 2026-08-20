@@ -2,7 +2,7 @@ import time
 import config
 
 
-class Distance_estimator:
+class DistanceEstimator:
 
     def __init__(self):
         self.cumulative_distance_m = 0.0
@@ -24,3 +24,7 @@ class Distance_estimator:
         self.cumulative_distance_m += self.speed_mps * dt         #updates distance
         self.last_time = current_time               #updates
         return self.cumulative_distance_m
+
+
+# Backward-compatibility alias
+Distance_estimator = DistanceEstimator
