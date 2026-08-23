@@ -9,9 +9,12 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 #1 Camera and video settings
-Frame_Width = 640
-Frame_Height = 480
-Target_Fps   = 30
+Frame_Width    = 640
+Frame_Height   = 480
+Target_Fps     = 30
+Show_Gui       = True   # Set to True for local video display, False for headless execution
+Camera_Source  = 0      # 0 for default webcam, or path to video/image (e.g., 'images/pipe_cracks.jpg')
+Fallback_Image = 'images/pipe_cracks.jpg'  # Fallback image stream if webcam 0 is unavailable
 
 
 #2.Image processing and CLAHE settings
@@ -34,6 +37,11 @@ Median_Defect_Area = 50
 #5. Distance and metrics calibration
 mm_per_pixel = 0.5
 Robot_Speed_mps = 0.15
+
+#6. YOLO Deep Learning Classifier Settings
+Use_Yolo             = True   # Set to True to enable YOLO AI model detection/classification
+Yolo_Model_Path      = 'ai/yolov8.pt'
+Yolo_Conf_Threshold = 0.25
 
 """
 End of configuration depending if there is modification needed 
