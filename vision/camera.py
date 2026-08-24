@@ -15,7 +15,6 @@ class CameraStream:
         self.running = False   #starting and stoping the background thread
         self.frame = None  #holds the latest frame
         
-
     def start(self): #method initialization 
         self.cap = cv.VideoCapture(self.source)
 
