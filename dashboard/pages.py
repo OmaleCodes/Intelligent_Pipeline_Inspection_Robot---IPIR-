@@ -1,5 +1,6 @@
 import sys
 import os
+from charts import render_defect_trend
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
