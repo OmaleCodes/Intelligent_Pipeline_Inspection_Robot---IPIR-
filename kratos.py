@@ -5,86 +5,63 @@ from vision.camera import CameraStream
 from vision.preprocess import Pipelinepreprocessor
 from vision.detector import DefectDetector
 from database.models import InspectionDatabase
+from ai.classifier import classify_defect
 
-
-#Load sample pipe image
-"""frame = cv.imread("images/pipe_cracks.jpg")
-if frame is None:
-    print("Error: Image not found!")
-    exit()
-"""
-
-#instance of camera vision( video capturing) from live webcam or robot video
-camera = CameraStream(source=0).start() #0 is the default webcam, change to video file path for testing
-
-#instance of new preprocessor class
+camera = CameraStream(source=0).start()
 preprocessor = Pipelinepreprocessor()
-
-#instance of defect dector class
 detector = DefectDetector()
-
-#instance of database class
 db = InspectionDatabase()
 
-#start an inspection run section
 run_id = db.start_run("PIPE_01")
-print(f"Inspection Session Started: {run_id}")
 
+CLASSIFY_COOLDOWN_SECONDS = 3
+last_classify_time = 0  # tracked outside the loop so it persists across iterations
 
-while True:
-      ret, frame = camera.read()
-      if ret is False or frame is None:
-          time.sleep(0.1)  #wait for a short time before trying to read the next frame
-          continue  #skip this iteration if frame read failed
-      
-         #process the frame through the vision model
-      results = preprocessor.process(frame)
+try:
+    while True:
+        ret, frame = camera.read()
 
-           #detect cracks for live feed camera capture
-      crack_boxes = detector.detect_cracks(results["clahe_gray"]) 
+        if ret is False or frame is None:
+            time.sleep(0.1)
+            continue
 
-      #looping through crack boxes to store value in the database
-      for (x,y,w,h) in crack_boxes:
-           db.log_defects(run_id, time.time(), "CRACK", x, y, w, h)
+        clean_frame = frame.copy()
 
-       #detect rusts for live feed camera capture
-      rust_boxes = detector.detect_rust(results["rust_mask"])
-      #looping through rust boxes to store value in the database
-      for (x, y, w, h) in rust_boxes:
-           db.log_defects(run_id, time.time(), "RUST", x, y, w, h)
+        processed = preprocessor.process(frame)
+        crack_boxes = detector.detect_cracks(processed["clahe_gray"])
+        rust_boxes = detector.detect_rust(processed["rust_mask"])
 
-        #draw boxes on the orignal video capture frame
-      detector.draw_boxes(frame, crack_boxes, (0, 0, 255), "CRACK") 
-      detector.draw_boxes(frame, rust_boxes, (0, 165, 255), "RUST")
+        now = time.time()
+        should_classify = (now - last_classify_time) >= CLASSIFY_COOLDOWN_SECONDS
 
-          #display  live annotation of video feed
-      cv.imshow("IPIR Live Feed", frame)
-      
-        #check for keypress to quite
-      if cv.waitKey(1) & 0xFF == ord('q'): 
-          break   #exit loop if 'q' is pressed
-        
-camera.stop()  #stop the camera stream
-db.end_run(run_id)  #mark the inspection run as completed
-print(f"Inspection Session Completed: {run_id}")
-cv.destroyAllWindows()
+        for (x, y, w, h) in crack_boxes:
+            db.log_defects(run_id, time.time(), "CRACK", x, y, w, h)
 
+            if should_classify:
+                crop = clean_frame[y:y + h, x:x + w]
+                second_opinion = classify_defect(crop)
+                print(f"[CRACK] detector.py found it. Roboflow second opinion: {second_opinion}")
+                last_classify_time = now
+                should_classify = False  # only one classification per cooldown window
 
-"""detect cracks and rust for images
-crack_boxes = detector.detect_cracks(results["clahe_gray"])
-rust_boxes = detector.detect_rust(results["rust_mask"])"""
+        for (x, y, w, h) in rust_boxes:
+            db.log_defects(run_id, time.time(), "RUST", x, y, w, h)
 
+            if should_classify:
+                crop = clean_frame[y:y + h, x:x + w]
+                second_opinion = classify_defect(crop)
+                print(f"[RUST] detector.py found it. Roboflow second opinion: {second_opinion}")
+                last_classify_time = now
+                should_classify = False
 
-"""draw boxes on the orignal image frame
-detector.draw_boxes(frame, crack_boxes, (0, 255, 0), "CRACKS") #use red box for cracks
-detector.draw_boxes(frame, rust_boxes, (0, 165, 255), "RUST") #use orange box for rust"""
+        detector.draw_boxes(frame, crack_boxes, (0, 0, 255), "CRACK")
+        detector.draw_boxes(frame, rust_boxes, (0, 255, 255), "RUST")
 
-"""display the output for images
-cv.imshow("Raw Input", frame)
-cv.imshow("Modular Preprocessed (Clahe Gray)", results["clahe_gray"])
-cv.imshow("Modular Preprocessed (Rust Mask)", results["rust_mask"])
-cv.imshow("Detected pipeline defects", frame)"""
+        cv.imshow("IPIR Live Feed", frame)
+        if cv.waitKey(1) & 0xFF == ord('q'):
+            break
 
-
-#cv.waitKey(0)
-#cv.destroyAllWindows()
+finally:
+    db.end_run(run_id)
+    camera.stop()
+    cv.destroyAllWindows()
