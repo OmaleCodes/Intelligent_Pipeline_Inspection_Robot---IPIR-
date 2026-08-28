@@ -29,7 +29,10 @@ class InspectionDatabase:
                 run_id TEXT,
                 timestamp REAL,
                 defect_type TEXT,
-                x INTEGER, y INTEGER, w INTEGER, h INTEGER)
+                x INTEGER, y INTEGER, w INTEGER, h INTEGER,
+                roboflow_class TEXT,
+                roboflow_confidence REAL,
+                is_trusted INTEGER)
         """)
         conn.commit()
         conn.close()
@@ -53,7 +56,10 @@ class InspectionDatabase:
          return run_id
 
 
-    def log_defects (self,run_id, timestamp, defect_type, x,y,w,h):
+    def log_defects (self, run_id, timestamp, defect_type, x, y, w, h,
+                     roboflow_class=None, roboflow_confidence=None, is_trusted=None):
+        # roboflow_* fields are optional since classify_defect() is throttled —
+        # most detections won't have a second opinion attached, and that's fine.
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         cursor.execute(""" 
@@ -61,8 +67,13 @@ class InspectionDatabase:
             run_id,
             timestamp,
             defect_type,
-            x,y,w,h)
-            VALUES(?,?,?,?,?,?,?)""", (run_id, timestamp, defect_type, x,y,w,h))
+            x,y,w,h,
+            roboflow_class,
+            roboflow_confidence,
+            is_trusted)
+            VALUES(?,?,?,?,?,?,?,?,?,?)""",
+            (run_id, timestamp, defect_type, x, y, w, h,
+             roboflow_class, roboflow_confidence, is_trusted))
         
         conn.commit()
         conn.close()
@@ -92,7 +103,9 @@ class InspectionDatabase:
     def get_defects_for_runs(self,selected_run):
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, timestamp, defect_type, x, y, w, h FROM defect_logs WHERE run_id = ? ", (selected_run,))
+            cursor.execute("""SELECT id, timestamp, defect_type, x, y, w, h,
+                            roboflow_class, roboflow_confidence, is_trusted
+                            FROM defect_logs WHERE run_id = ? """, (selected_run,))
             defects = cursor.fetchall()
             return defects
 
