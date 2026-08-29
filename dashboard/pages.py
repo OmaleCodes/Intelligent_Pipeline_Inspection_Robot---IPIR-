@@ -55,7 +55,8 @@ if run:
     st.markdown("---")
 
     # 4. Render Pandas DataFrame Table
-    df = pd.DataFrame(defects, columns=['ID', 'Timestamp', 'Type', 'X', 'Y', 'Width', 'Height'])
+    df = pd.DataFrame(defects, columns=['ID', 'Timestamp', 'Type', 'X', 'Y', 'Width', 'Height',
+                                         'Roboflow Class', 'Roboflow Confidence', 'Trusted'])
     st.dataframe(df, use_container_width=True)
 else:
     st.info("No inspection runs found in database. Run 'python3 kratos.py' first!")
