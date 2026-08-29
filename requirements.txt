@@ -4,8 +4,9 @@
 opencv-python>=4.8.0
 numpy>=1.24.0
 
-# AI / Deep Learning
-ultralytics>=8.0.0        # YOLOv8 inference and training
+# AI / Defect Classification (Roboflow-hosted RF-DETR model)
+inference-sdk>=0.9.0
+python-dotenv>=1.0.0
 
 # Database (sqlite3 is built-in, no pip package needed)
 
