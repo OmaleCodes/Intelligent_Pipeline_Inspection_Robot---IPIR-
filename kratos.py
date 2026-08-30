@@ -7,7 +7,7 @@ from vision.detector import DefectDetector
 from database.models import InspectionDatabase
 from ai.classifier import classify_defect
 
-camera = CameraStream(source=0).start()
+camera = CameraStream(source="images/pipe_tear.jpg").start()
 preprocessor = Pipelinepreprocessor()
 detector = DefectDetector()
 db = InspectionDatabase()
@@ -35,29 +35,35 @@ try:
         should_classify = (now - last_classify_time) >= CLASSIFY_COOLDOWN_SECONDS
 
         for (x, y, w, h) in crack_boxes:
-            db.log_defects(run_id, time.time(), "CRACK", x, y, w, h)
+            opinion = {"defect_type": None, "confidence": None, "is_trusted": None}
 
             if should_classify:
                 crop = clean_frame[y:y + h, x:x + w]
-                second_opinion = classify_defect(crop)
-                print(f"[CRACK] detector.py found it. Roboflow second opinion: {second_opinion}")
+                opinion = classify_defect(crop)
+                print(f"[CRACK] detector.py found it. Roboflow second opinion: {opinion}")
                 last_classify_time = now
                 should_classify = False  # only one classification per cooldown window
 
+            db.log_defects(run_id, time.time(), "CRACK", x, y, w, h,
+                            opinion["defect_type"], opinion["confidence"], opinion["is_trusted"])
+
         for (x, y, w, h) in rust_boxes:
-            db.log_defects(run_id, time.time(), "RUST", x, y, w, h)
+            opinion = {"defect_type": None, "confidence": None, "is_trusted": None}
 
             if should_classify:
                 crop = clean_frame[y:y + h, x:x + w]
-                second_opinion = classify_defect(crop)
-                print(f"[RUST] detector.py found it. Roboflow second opinion: {second_opinion}")
+                opinion = classify_defect(crop)
+                print(f"[RUST] detector.py found it. Roboflow second opinion: {opinion}")
                 last_classify_time = now
                 should_classify = False
 
-        detector.draw_boxes(frame, crack_boxes, (0, 0, 255), "CRACK")
-        detector.draw_boxes(frame, rust_boxes, (0, 255, 255), "RUST")
+            db.log_defects(run_id, time.time(), "RUST", x, y, w, h,
+                            opinion["defect_type"], opinion["confidence"], opinion["is_trusted"])
 
-        cv.imshow("IPIR Live Feed", frame)
+        display_frame = clean_frame.copy()
+        detector.draw_boxes(display_frame, crack_boxes, (0, 0, 255), "CRACK")
+        detector.draw_boxes(display_frame, rust_boxes, (0, 255, 255), "RUST")
+        cv.imshow("IPIR Live Feed", display_frame)
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
 
